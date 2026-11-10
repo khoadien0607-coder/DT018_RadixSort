@@ -1,105 +1,126 @@
-# ĐỒ ÁN HỌC PHẦN CẤU TRÚC DỮ LIỆU VÀ GIẢI THUẬT (INT13185 - NHÓM 03)
-## ĐỀ TÀI DT018: RADIX SORT CHO MẢNG CÓ SỐ ÂM VÀ SỐ DƯƠNG
+<div align="center">
 
-### 1. Thông tin sinh viên & Đề tài
-- **Họ và tên:** Nguyễn Khoa Điền
-- **Mã số sinh viên (MSSV):** N24DCDT014
-- **Lớp:** D24CQDT01-N
-- **Học viện Công nghệ Bưu chính Viễn thông - Cơ sở tại TP. Hồ Chí Minh**
-- **Giảng viên hướng dẫn:** Hồ Nhựt Minh
-- **Ngôn ngữ lập trình:** Ngôn ngữ C (chuẩn C99 / C11, trình biên dịch `gcc`)
-- **Giáo trình căn cứ:** `Giao-trinh-Cau-truc-du-lieu-va-Giai-thuat-INT1306.pdf`, Chương 2, Mục 2.4; Mục 2.8 Bài 30; trang in 45–48, 62; trang PDF 57–60, 74.
-- **URL GitHub cá nhân:** `[ĐIỀN_URL_REPO_GITHUB_CUA_DIEN]`
-- **Commit SHA C:** `[ĐIỀN_SHA_COMMIT_C_40_KY_TU]`
-- **Commit SHA S:** `[ĐIỀN_SHA_COMMIT_S_40_KY_TU]`
+# 🗂️ DT018 — Radix Sort cho mảng có số âm & số dương
+
+**INT13185 Nhóm 03 · Học viện Công nghệ Bưu chính Viễn thông TP.HCM**
+
+[![Tests](https://img.shields.io/badge/Tests-14%2F14%20PASS-brightgreen?style=flat-square&logo=checkmarx)](test/runtests.c)
+[![Language](https://img.shields.io/badge/Language-C99%2FC11-blue?style=flat-square&logo=c)](src/DeTai.c)
+[![Demo](https://img.shields.io/badge/🌐_Demo-Chạy_online-orange?style=flat-square)](https://khoadien0607-coder.github.io/DT018_RadixSort/)
+
+🔗 **[Xem demo trực tuyến →](https://khoadien0607-coder.github.io/DT018_RadixSort/)**
+
+</div>
 
 ---
 
-### 2. Cấu trúc thư mục mã nguồn
+## 👤 Thông tin
+
+| | |
+|---|---|
+| **Sinh viên** | Nguyễn Khoa Điền — N24DCDT014 — D24CQDT01-N |
+| **Giảng viên** | ThS. Hồ Nhựt Minh |
+| **Môn học** | Cấu trúc Dữ liệu & Giải thuật — INT13185 Nhóm 03 |
+| **Commit C** | [`dfc85b6`](https://github.com/khoadien0607-coder/DT018_RadixSort/commit/dfc85b683608d9952e7661dd10174df14350b23b) · mã nguồn hoàn chỉnh & 14/14 test PASS |
+| **Commit S** | [`2fdc1fa`](https://github.com/khoadien0607-coder/DT018_RadixSort/commit/2fdc1fa6f8bc720baba3fcf7ea2367c800781a1c) · bổ sung 11 ảnh minh chứng |
+
+---
+
+## 🎯 Vấn đề & Giải pháp
+
+**Vấn đề:** Radix Sort trong giáo trình chỉ sắp xếp được mảng **không âm**. Khi mảng có số âm, phép `% 10` cho kết quả âm → chỉ số mảng đếm âm → **Segmentation fault**.
+
+**Ý tưởng mấu chốt:**
 
 ```
-N24DCDT014_DT018_NguyenKhoaDien_MaNguon/
-├── .gitignore
-├── README.md                   # Hướng dẫn chi tiết biên dịch và chạy
-├── demo.c                      # Chương trình demo chạy Ví dụ 1, Ví dụ 2 và nhập bàn phím
-├── src/
-│   ├── DeTai.h                 # Khai báo nguyên mẫu hàm, hằng số, validator
-│   └── DeTai.c                 # Cài đặt thuật toán Radix Sort có âm, không âm và tách mảng
-├── test/
-│   └── runtests.c              # Bộ kiểm thử tự động với 14 ca kiểm độc lập
+Với số âm: x < y < 0  ⟺  |x| > |y|
+  → Sắp |âm| tăng dần  →  đảo chiều  →  đổi dấu  =  âm tăng dần ✓
+```
+
+**Ví dụ 1 (theo phiếu giao):**
+```
+Input:   [-5,  2, -10,  0,  2]
+         ────────────────────
+         Nhóm âm: [5, 10]  → Radix → [5,10] → đảo → [10,5] → đổi dấu → [-10,-5]
+         Nhóm ≥0: [2, 0, 2] → Radix → [0, 2, 2]
+         Ghép lại: [-10,-5]  +  [0,2,2]
+Output:  [-10, -5,  0,  2,  2]  ✓
+```
+
+---
+
+## ⚡ Chạy nhanh
+
+```bash
+git clone https://github.com/khoadien0607-coder/DT018_RadixSort.git
+cd DT018_RadixSort
+
+# Biên dịch
+gcc -Wall -Wextra -O2 src/DeTai.c demo.c -o demo.exe
+gcc -Wall -Wextra -O2 src/DeTai.c test/runtests.c -o test/runtests.exe
+
+# Chạy demo (menu 1-8)
+./demo.exe
+
+# Chạy kiểm thử tự động
+./test/runtests.exe
+```
+
+```
+KET QUA KIEM THU: 14 / 14 ca dat (PASS)
+DANH GIA: ALL TESTS PASSED! CHAT LUONG MA NGUON HOAN HAO!
+```
+
+---
+
+## 📂 Cấu trúc
+
+```
+├── src/DeTai.h          ← Khai báo hàm & hằng (MAX_N=5000, miền ±999999)
+├── src/DeTai.c          ← radix_co_am · radix_khong_am · tach_hai_dau · validator
+├── demo.c               ← Demo tương tác 8 chế độ
+├── test/runtests.c      ← 14 ca kiểm thử tự động (TC01–TC14)
 └── docs/
-    └── anh_ket_qua/            # Chứa 11 ảnh chụp màn hình minh chứng gốc (A01 - A11)
+    ├── index.html       ← 🌐 Demo web chạy thuật toán ngay trên trình duyệt
+    └── anh_ket_qua/     ← 11 ảnh chụp màn hình A01–A11
 ```
 
 ---
 
-### 3. Hướng dẫn biên dịch và chạy (Bằng trình biên dịch GCC)
+## ✅ Bộ kiểm thử 14 ca
 
-Mở terminal (PowerShell, Command Prompt hoặc Git Bash) tại thư mục mã nguồn:
-
-#### Bước 3.1. Biên dịch chương trình Demo và Bộ Test
-```powershell
-# Biên dịch demo.c thành demo.exe
-gcc -Wall -Wextra -O2 src/DeTai.c demo.c -o demo.exe
-
-# Biên dịch test/runtests.c thành test/runtests.exe
-gcc -Wall -Wextra -O2 src/DeTai.c test/runtests.c -o test/runtests.exe
-```
-
-#### Bước 3.2. Chạy chương trình Demo
-```powershell
-./demo.exe
-```
-Chương trình sẽ tự động chạy:
-- Ví dụ 1 trên phiếu: `[-5, 2, -10, 0, 2]` -> `[-10, -5, 0, 2, 2]`
-- Ví dụ 2 trên phiếu: `[-3, -1, -2]` -> `[-3, -2, -1]`
-- Ví dụ 3 hỗn hợp: `[100, -250, 45, -3, 0, -999, 12]`
-- Tùy chọn nhập mảng bất kỳ từ bàn phím.
-
-#### Bước 3.3. Chạy bộ kiểm thử tự động (14 ca độc lập)
-```powershell
-./test/runtests.exe
-```
-Kết quả hiển thị:
-```
-======================================================================
-   KET QUA KIEM THU: 14 / 14 ca dat (PASS)
-   DANH GIA: ALL TESTS PASSED! CHAT LUONG MA NGUON HOAN HAO!
-======================================================================
-```
+| Mã | Loại | Input | Kết quả |
+|:--:|------|-------|:-------:|
+| TC01 | Phiếu — VD01 | `[-5, 2, -10, 0, 2]` → `[-10,-5,0,2,2]` | ✅ |
+| TC02 | Phiếu — VD02 | `[-3,-1,-2]` → `[-3,-2,-1]` | ✅ |
+| TC03 | Tự thiết kế | `[-999,45,0,-3,100,-250,12]` | ✅ |
+| TC04 | Tự thiết kế | `[-7,5,-7,0,5,-1,0,2]` (có trùng lặp) | ✅ |
+| TC05 | Biên n=0 | `[]` → `[]` | ✅ |
+| TC06 | Biên n=1 âm | `[-42]` → `[-42]` | ✅ |
+| TC07 | Biên n=1 dương | `[7]` → `[7]` | ✅ |
+| TC08 | Biên toàn 0 | `[0,0,0]` → `[0,0,0]` | ✅ |
+| TC09 | Cực trị miền | `[999999,-999999,0]` | ✅ |
+| TC10 | Đã sắp tăng | `[-10,-5,0,2,8]` | ✅ |
+| TC11 | Giảm dần | `[8,2,0,-5,-10]` | ✅ |
+| TC12 | Toàn dương | `[50,1,300,20]` | ✅ |
+| TC13 | Validator | `a[2]=1000000 > 999999` → từ chối | ✅ |
+| TC14 | Validator | `a[0]=-1000000 < -999999` → từ chối | ✅ |
 
 ---
 
-### 4. Quy trình Git và Kiểm tra tính tái lập (Commit C và S)
+## 📊 Độ phức tạp
 
-#### Tạo Commit C (Code & Test đạt):
-```powershell
-git init
-git add README.md .gitignore src demo.c test docs
-git commit -m "Commit C: Hoan thanh thuat toan Radix Sort ngon ngu C va bo test"
-git branch -M main
-git remote add origin https://github.com/TEN_TAI_KHOAN/DT018_RadixSort.git
-git push -u origin main
-git rev-parse HEAD
-```
+| Pha | Thời gian | Không gian |
+|-----|:---------:|:----------:|
+| Tách nhóm | O(n) | O(n) |
+| Radix Sort (d≤6, k=10) | O(d·n) | O(n) |
+| Đảo chiều + đổi dấu | O(n) | O(1) |
+| **Tổng** | **O(n)** | **O(n)** |
 
-#### Clone sang thư mục mới kiểm tra lại (Chụp ảnh A10):
-```powershell
-cd ..
-git clone https://github.com/TEN_TAI_KHOAN/DT018_RadixSort.git kiem_tra_clone
-cd kiem_tra_clone
-gcc -Wall -Wextra -O2 src/DeTai.c demo.c -o demo.exe
-./demo.exe
-gcc -Wall -Wextra -O2 src/DeTai.c test/runtests.c -o test/runtests.exe
-./test/runtests.exe
-```
+> Miền: `0 ≤ n ≤ 5000`, `-999999 ≤ a[i] ≤ 999999`
 
-#### Tạo Commit S (Bổ sung 11 ảnh minh chứng):
-Sau khi chụp 11 ảnh và lưu vào `docs/anh_ket_qua/`:
-```powershell
-git add docs/anh_ket_qua README.md
-git commit -m "Commit S: Bo sung 11 anh minh chung va hoan tat ho so"
-git push origin main
-git rev-parse HEAD
-```
-*(Ghi SHA S vào file TXT nộp rời)*.
+---
+
+<div align="center">
+<sub>Nguyễn Khoa Điền · N24DCDT014 · INT13185 Nhóm 03 · 11/2026</sub>
+</div>

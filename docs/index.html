@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DT018 — Radix Sort Demo | Nguyễn Khoa Điền</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #1f2937;
+      --border: #30363d;
+      --accent: #58a6ff;
+      --accent2: #3fb950;
+      --warn: #d29922;
+      --danger: #f85149;
+      --text: #c9d1d9;
+      --text2: #8b949e;
+      --neg: #79c0ff;
+      --pos: #56d364;
+      --zero: #e3b341;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .logo { font-size: 28px; }
+    .header-text h1 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .header-text p { font-size: 13px; color: var(--text2); margin-top: 2px; }
+    .badges { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+    .badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+    .badge-green { background: #1a3d2b; color: var(--accent2); border: 1px solid #2ea043; }
+    .badge-blue  { background: #0d2340; color: var(--accent);  border: 1px solid #1f6feb; }
+
+    /* ── Layout ── */
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .card-header {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-body { padding: 20px; }
+
+    /* ── Algorithm Explanation ── */
+    .algo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 600px) { .algo-grid { grid-template-columns: 1fr; } }
+    .algo-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .algo-box h3 { font-size: 13px; color: var(--text2); margin-bottom: 8px; }
+    .algo-box p  { font-size: 13px; line-height: 1.6; }
+    .key-insight {
+      background: #0d2340;
+      border: 1px solid #1f6feb;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .key-insight strong { color: var(--accent); }
+    code { font-family: 'SFMono-Regular', Consolas, monospace; }
+
+    /* ── Input Controls ── */
+    .input-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+    .input-group { display: flex; flex-direction: column; gap: 4px; }
+    .input-group label { font-size: 12px; color: var(--text2); }
+    input[type="text"] {
+      background: #010409;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 8px 12px;
+      font-size: 14px;
+      font-family: 'SFMono-Regular', Consolas, monospace;
+      width: 400px;
+      max-width: 100%;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus { border-color: var(--accent); }
+    .btn {
+      padding: 8px 18px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: #238636; color: #fff; }
+    .btn-primary:hover { background: #2ea043; }
+    .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--border); }
+
+    /* ── Preset buttons ── */
+    .presets { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .preset-btn {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text2);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .preset-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Error / Success msg ── */
+    .msg {
+      font-size: 13px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin-top: 12px;
+    }
+    .msg-error   { background: #2d0f0f; border: 1px solid var(--danger); color: var(--danger); }
+    .msg-success { background: #0f2d1e; border: 1px solid var(--accent2); color: var(--accent2); }
+    .msg-info    { background: #0d2340; border: 1px solid var(--accent); color: var(--accent); }
+    .hidden { display: none; }
+
+    /* ── Array Visualizer ── */
+    .array-vis {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 12px;
+      min-height: 48px;
+      align-items: center;
+    }
+    .el {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      animation: pop-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    @keyframes pop-in {
+      from { transform: scale(0.5); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    .el-box {
+      min-width: 44px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: 'SFMono-Regular', Consolas, monospace;
+      border: 2px solid transparent;
+      transition: all 0.3s;
+    }
+    .el-box.neg  { background: #0d2340; border-color: #1f6feb; color: var(--neg); }
+    .el-box.pos  { background: #0f2d1e; border-color: #2ea043; color: var(--pos); }
+    .el-box.zero { background: #2d1f00; border-color: #bb8009; color: var(--zero); }
+    .el-idx { font-size: 10px; color: var(--text2); }
+
+    /* ── Steps ── */
+    .steps { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+    .step {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .step-header {
+      background: var(--surface2);
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .step-num {
+      background: var(--accent);
+      color: #0d1117;
+      font-size: 11px;
+      font-weight: 800;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .step-body { padding: 14px 16px; }
+    .step-body p { font-size: 13px; color: var(--text2); margin-bottom: 8px; }
+
+    /* ── Result banner ── */
+    .result-banner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #0f2d1e;
+      border: 1px solid #2ea043;
+      border-radius: 8px;
+      padding: 14px 18px;
+    }
+    .result-banner .check { font-size: 24px; }
+    .result-banner .info  { flex: 1; }
+    .result-banner .info h3 { font-size: 14px; color: var(--accent2); }
+    .result-banner .info p  { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+    /* ── Test Cases ── */
+    .tc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 10px;
+    }
+    .tc-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .tc-card:hover { border-color: var(--accent); }
+    .tc-label { font-size: 11px; color: var(--accent); font-weight: 700; margin-bottom: 4px; }
+    .tc-desc  { font-size: 12px; color: var(--text2); margin-bottom: 6px; }
+    .tc-arr   { font-size: 12px; font-family: monospace; color: var(--text); }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 12px;
+      color: var(--text2);
+      border-top: 1px solid var(--border);
+      margin-top: 8px;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="logo">🔢</span>
+  <div class="header-text">
+    <h1>DT018 — Radix Sort cho mảng có số âm & số dương</h1>
+    <p>Nguyễn Khoa Điền · N24DCDT014 · INT13185 Nhóm 03 · Học viện CNBCVT TP.HCM</p>
+    <div class="badges">
+      <span class="badge badge-green">✓ 14/14 Tests PASS</span>
+      <span class="badge badge-blue">C99 / C11</span>
+      <span class="badge badge-blue">O(n) Time & Space</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- Algorithm Card -->
+  <div class="card">
+    <div class="card-header">💡 Nguyên lý thuật toán</div>
+    <div class="card-body">
+      <div class="key-insight">
+        <strong>Mấu chốt:</strong> Với hai số âm <code>x, y &lt; 0</code>: &nbsp;
+        <code>x &lt; y &nbsp;⟺&nbsp; |x| &gt; |y|</code><br>
+        → Sắp <strong>độ lớn tuyệt đối tăng dần</strong>, rồi <strong>đảo chiều</strong>, rồi <strong>đổi dấu</strong> → phần âm đúng thứ tự tăng dần.
+      </div>
+      <div class="algo-grid">
+        <div class="algo-box">
+          <h3>📥 Bước 1 — Tách nhóm</h3>
+          <p>Duyệt mảng: phần tử âm → <code>am[]</code> (lưu giá trị gốc), phần tử ≥ 0 → <code>khong_am[]</code></p>
+        </div>
+        <div class="algo-box">
+          <h3>⚙️ Bước 2 — Sắp xếp Radix LSD</h3>
+          <p>Dùng <code>radix_khong_am()</code> sắp cả hai nhóm theo độ lớn tuyệt đối (cơ số 10, d ≤ 6)</p>
+        </div>
+        <div class="algo-box">
+          <h3>🔄 Bước 3 — Đảo chiều nhóm âm</h3>
+          <p>Độ lớn âm sau Radix tăng dần → đảo ngược → độ lớn âm giảm dần → đổi dấu → âm tăng dần ✓</p>
+        </div>
+        <div class="algo-box">
+          <h3>🔗 Bước 4 — Ghép kết quả</h3>
+          <p>Nối <code>am[]</code> (đã đúng) trước <code>khong_am[]</code> (đã đúng) → mảng hoàn chỉnh tăng dần</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Demo Card -->
+  <div class="card">
+    <div class="card-header">🚀 Chạy Demo — Nhập mảng bất kỳ</div>
+    <div class="card-body">
+      <div class="input-row">
+        <div class="input-group" style="flex:1">
+          <label>Nhập mảng số nguyên (cách nhau bởi dấu phẩy hoặc khoảng trắng)</label>
+          <input type="text" id="arr-input"
+            value="-5, 2, -10, 0, 2"
+            placeholder="vd: -5, 2, -10, 0, 2"
+          />
+        </div>
+        <button class="btn btn-primary" onclick="runSort()">▶ Sắp xếp</button>
+        <button class="btn btn-secondary" onclick="clearAll()">✕ Xoá</button>
+      </div>
+
+      <div class="presets">
+        <strong style="font-size:12px;color:var(--text2);align-self:center;">Ví dụ nhanh:</strong>
+        <button class="preset-btn" onclick="setPreset('-5, 2, -10, 0, 2')">VD01 (phiếu)</button>
+        <button class="preset-btn" onclick="setPreset('-3, -1, -2')">VD02 (toàn âm)</button>
+        <button class="preset-btn" onclick="setPreset('-999, 45, 0, -3, 100, -250, 12')">TK01 (hỗn hợp)</button>
+        <button class="preset-btn" onclick="setPreset('-7, 5, -7, 0, 5, -1, 0, 2')">TK02 (trùng lặp)</button>
+        <button class="preset-btn" onclick="setPreset('999999, -999999, 0')">Cực trị</button>
+        <button class="preset-btn" onclick="setPreset('0, 0, 0')">Toàn 0</button>
+        <button class="preset-btn" onclick="randomArr()">🎲 Ngẫu nhiên</button>
+      </div>
+
+      <div id="msg-box" class="msg hidden"></div>
+
+      <!-- Input visualization -->
+      <div id="vis-input-wrap" class="hidden">
+        <p style="font-size:12px;color:var(--text2);margin-top:16px;margin-bottom:4px;">📥 Mảng đầu vào (n = <span id="n-label">0</span>):</p>
+        <div id="vis-input" class="array-vis"></div>
+      </div>
+
+      <!-- Steps -->
+      <div id="steps-container" class="steps hidden" style="margin-top:20px;"></div>
+
+      <!-- Result -->
+      <div id="result-wrap" class="hidden" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
+  <!-- Test Cases Card -->
+  <div class="card">
+    <div class="card-header">✅ Bộ kiểm thử 14 ca — Click để chạy</div>
+    <div class="card-body">
+      <div class="tc-grid" id="tc-grid"></div>
+      <div id="tc-result" class="hidden" style="margin-top:14px;"></div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Nguyễn Khoa Điền · N24DCDT014 · INT13185 Nhóm 03 ·
+  <a href="https://github.com/khoadien0607-coder/DT018_RadixSort" target="_blank">GitHub →</a>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════
+//  CORE ALGORITHM  (mirrors src/DeTai.c)
+// ═══════════════════════════════════════════
+
+const MAX_N   = 5000;
+const MAX_VAL = 999999;
+const MIN_VAL = -999999;
+
+function kiemTraDauVao(a) {
+  if (a.length > MAX_N) return `n = ${a.length} vượt quá MAX_N = ${MAX_N}`;
+  for (let i = 0; i < a.length; i++) {
+    if (!Number.isInteger(a[i])) return `a[${i}] = ${a[i]} không phải số nguyên`;
+    if (a[i] < MIN_VAL || a[i] > MAX_VAL)
+      return `[Loi Validator] a[${i}] = ${a[i]} vượt miền [${MIN_VAL}, ${MAX_VAL}]`;
+  }
+  return null; // ok
+}
+
+function radixKhongAm(arr) {
+  if (arr.length <= 1) return arr.slice();
+  const a = arr.slice();
+  const maxVal = Math.max(...a);
+  for (let exp = 1; Math.floor(maxVal / exp) > 0; exp *= 10) {
+    const count = new Array(10).fill(0);
+    const b = new Array(a.length);
+    for (let i = 0; i < a.length; i++) count[Math.floor(a[i] / exp) % 10]++;
+    for (let i = 1; i < 10; i++) count[i] += count[i - 1];
+    for (let i = a.length - 1; i >= 0; i--) {
+      const d = Math.floor(a[i] / exp) % 10;
+      b[--count[d]] = a[i];
+    }
+    for (let i = 0; i < a.length; i++) a[i] = b[i];
+  }
+  return a;
+}
+
+function radixCoAm(a) {
+  // Returns { sorted, steps, am, khong_am, am_sorted, am_reversed, final }
+  const n = a.length;
+  const steps = [];
+
+  if (n <= 1) {
+    steps.push({ title: 'n ≤ 1 → Trả về ngay', desc: 'Mảng rỗng hoặc 1 phần tử không cần sắp xếp.', arrays: [{ label: 'Kết quả', arr: a.slice() }] });
+    return { sorted: a.slice(), steps };
+  }
+
+  // Step 1: Tách
+  const am = [], khong_am = [];
+  for (const x of a) { if (x < 0) am.push(x); else khong_am.push(x); }
+  steps.push({
+    title: 'Bước 1 — Tách mảng thành 2 nhóm',
+    desc: `Duyệt n=${n} phần tử: âm → am[], không âm → khong_am[]`,
+    arrays: [
+      { label: `Nhóm âm (n_am=${am.length})`, arr: am.slice() },
+      { label: `Nhóm ≥0 (n_kham=${khong_am.length})`, arr: khong_am.slice() },
+    ]
+  });
+
+  // Step 2: Radix Sort each group (độ lớn)
+  const doLon = am.map(x => -x); // |am[i]|
+  const doLonSorted = radixKhongAm(doLon);
+  const khongAmSorted = radixKhongAm(khong_am);
+  steps.push({
+    title: 'Bước 2 — Radix Sort LSD (cơ số 10)',
+    desc: 'Sắp nhóm ≥0 trực tiếp. Sắp |nhóm âm| (độ lớn tuyệt đối) tăng dần.',
+    arrays: [
+      { label: 'Nhóm ≥0 đã sắp', arr: khongAmSorted },
+      { label: '|Nhóm âm| đã sắp theo độ lớn', arr: doLonSorted },
+    ]
+  });
+
+  // Step 3: Đảo chiều nhóm âm
+  const amReversed = doLonSorted.slice().reverse().map(x => -x);
+  steps.push({
+    title: 'Bước 3 — Đảo chiều & đổi dấu nhóm âm',
+    desc: 'x < y < 0 ⟺ |x| > |y|. Vì vậy: |âm| tăng dần → ĐẢO → |âm| giảm dần → ĐỔI DẤU → âm tăng dần ✓',
+    arrays: [
+      { label: 'Độ lớn sau đảo chiều', arr: doLonSorted.slice().reverse() },
+      { label: 'Nhóm âm sau đổi dấu', arr: amReversed },
+    ]
+  });
+
+  // Step 4: Ghép
+  const result = [...amReversed, ...khongAmSorted];
+  steps.push({
+    title: 'Bước 4 — Ghép kết quả',
+    desc: 'Nối nhóm âm (đã đúng) trước nhóm ≥0 (đã đúng)',
+    arrays: [
+      { label: 'Kết quả cuối cùng ✓', arr: result },
+    ]
+  });
+
+  return { sorted: result, steps };
+}
+
+// ═══════════════════════════════════════════
+//  UI HELPERS
+// ═══════════════════════════════════════════
+
+function colorClass(x) {
+  if (x < 0) return 'neg';
+  if (x > 0) return 'pos';
+  return 'zero';
+}
+
+function renderArray(arr, container) {
+  container.innerHTML = '';
+  if (!arr || arr.length === 0) {
+    container.innerHTML = '<span style="color:var(--text2);font-size:13px">[ ] (mảng rỗng)</span>';
+    return;
+  }
+  arr.forEach((x, i) => {
+    const el = document.createElement('div');
+    el.className = 'el';
+    el.style.animationDelay = `${i * 30}ms`;
+    el.innerHTML = `
+      <div class="el-box ${colorClass(x)}">${x}</div>
+      <div class="el-idx">${i}</div>
+    `;
+    container.appendChild(el);
+  });
+}
+
+function showMsg(text, type = 'info') {
+  const box = document.getElementById('msg-box');
+  box.className = `msg msg-${type}`;
+  box.textContent = text;
+}
+
+function clearAll() {
+  document.getElementById('arr-input').value = '';
+  document.getElementById('msg-box').className = 'msg hidden';
+  document.getElementById('vis-input-wrap').className = 'hidden';
+  document.getElementById('steps-container').className = 'steps hidden';
+  document.getElementById('result-wrap').className = 'hidden';
+}
+
+function setPreset(val) {
+  document.getElementById('arr-input').value = val;
+  runSort();
+}
+
+function randomArr() {
+  const n = Math.floor(Math.random() * 10) + 3;
+  const arr = Array.from({ length: n }, () => Math.floor(Math.random() * 2001) - 1000);
+  document.getElementById('arr-input').value = arr.join(', ');
+  runSort();
+}
+
+function parseInput() {
+  const raw = document.getElementById('arr-input').value.trim();
+  if (!raw) return null;
+  const tokens = raw.split(/[\s,]+/).filter(Boolean);
+  const nums = tokens.map(t => {
+    const n = Number(t);
+    if (!Number.isInteger(n)) throw new Error(`"${t}" không phải số nguyên`);
+    return n;
+  });
+  return nums;
+}
+
+function runSort() {
+  // Reset
+  document.getElementById('msg-box').className = 'msg hidden';
+  document.getElementById('vis-input-wrap').className = 'hidden';
+  document.getElementById('steps-container').className = 'steps hidden';
+  document.getElementById('result-wrap').className = 'hidden';
+
+  let arr;
+  try { arr = parseInput(); }
+  catch(e) { showMsg('⚠️ ' + e.message, 'error'); return; }
+
+  if (arr === null) { showMsg('⚠️ Vui lòng nhập mảng!', 'error'); return; }
+
+  const err = kiemTraDauVao(arr);
+  if (err) { showMsg('🚫 ' + err, 'error'); return; }
+
+  // Show input
+  const inputWrap = document.getElementById('vis-input-wrap');
+  inputWrap.className = '';
+  document.getElementById('n-label').textContent = arr.length;
+  renderArray(arr, document.getElementById('vis-input'));
+
+  // Run algorithm
+  const { sorted, steps } = radixCoAm(arr);
+
+  // Show steps
+  const stepsContainer = document.getElementById('steps-container');
+  stepsContainer.className = 'steps';
+  stepsContainer.innerHTML = '';
+  steps.forEach((step, si) => {
+    const div = document.createElement('div');
+    div.className = 'step';
+    div.innerHTML = `
+      <div class="step-header">
+        <span class="step-num">${si + 1}</span>
+        <span>${step.title}</span>
+      </div>
+      <div class="step-body">
+        <p>${step.desc}</p>
+        ${step.arrays.map(({ label, arr: a }) => `
+          <div style="margin-top:8px">
+            <div style="font-size:11px;color:var(--text2);margin-bottom:4px">${label}:</div>
+            <div class="array-vis" id="sv-${si}-${label.replace(/[^a-z0-9]/gi,'_')}"></div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    stepsContainer.appendChild(div);
+
+    // Render arrays into their containers
+    setTimeout(() => {
+      step.arrays.forEach(({ label, arr: a }) => {
+        const id = `sv-${si}-${label.replace(/[^a-z0-9]/gi,'_')}`;
+        const c = document.getElementById(id);
+        if (c) renderArray(a, c);
+      });
+    }, 50);
+  });
+
+  // Show result
+  const resultWrap = document.getElementById('result-wrap');
+  resultWrap.className = '';
+  resultWrap.innerHTML = `
+    <div class="result-banner">
+      <span class="check">✅</span>
+      <div class="info">
+        <h3>Sắp xếp hoàn thành!</h3>
+        <p>Thời gian: O(n), Không gian: O(n) · n = ${arr.length} phần tử</p>
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:4px">📤 Kết quả (tăng dần):</div>
+      <div class="array-vis" id="vis-result"></div>
+    </div>
+  `;
+  setTimeout(() => renderArray(sorted, document.getElementById('vis-result')), 50);
+}
+
+// ═══════════════════════════════════════════
+//  TEST CASES
+// ═══════════════════════════════════════════
+
+const TEST_CASES = [
+  { id: 'TC01', label: 'VD01', desc: 'Ví dụ 1 theo phiếu giao', input: [-5,2,-10,0,2], expected: [-10,-5,0,2,2] },
+  { id: 'TC02', label: 'VD02', desc: 'Ví dụ 2 — toàn âm', input: [-3,-1,-2], expected: [-3,-2,-1] },
+  { id: 'TC03', label: 'TK01', desc: 'Hỗn hợp nhiều chữ số', input: [-999,45,0,-3,100,-250,12], expected: [-999,-250,-3,0,12,45,100] },
+  { id: 'TC04', label: 'TK02', desc: 'Phần tử trùng lặp', input: [-7,5,-7,0,5,-1,0,2], expected: [-7,-7,-1,0,0,2,5,5] },
+  { id: 'TC05', label: 'BIEN01', desc: 'Mảng rỗng (n=0)', input: [], expected: [] },
+  { id: 'TC06', label: 'BIEN02', desc: 'Mảng 1 phần tử âm', input: [-42], expected: [-42] },
+  { id: 'TC07', label: 'BIEN03a', desc: 'Mảng 1 phần tử dương', input: [7], expected: [7] },
+  { id: 'TC08', label: 'BIEN03b', desc: 'Toàn số 0', input: [0,0,0], expected: [0,0,0] },
+  { id: 'TC09', label: 'KT09', desc: 'Cực trị miền ±999999', input: [999999,-999999,0], expected: [-999999,0,999999] },
+  { id: 'TC10', label: 'KT10', desc: 'Đã sắp tăng sẵn', input: [-10,-5,0,2,8], expected: [-10,-5,0,2,8] },
+  { id: 'TC11', label: 'KT11', desc: 'Giảm dần hoàn toàn', input: [8,2,0,-5,-10], expected: [-10,-5,0,2,8] },
+  { id: 'TC12', label: 'KT12', desc: 'Toàn số dương', input: [50,1,300,20], expected: [1,20,50,300] },
+  { id: 'TC13', label: 'LOI01', desc: 'Validator: vượt MAX_VAL', input: [1,2,1000000], expected: 'ERROR' },
+  { id: 'TC14', label: 'LOI02', desc: 'Validator: vượt MIN_VAL', input: [-1000000,0], expected: 'ERROR' },
+];
+
+function buildTestCards() {
+  const grid = document.getElementById('tc-grid');
+  grid.innerHTML = '';
+  TEST_CASES.forEach(tc => {
+    const card = document.createElement('div');
+    card.className = 'tc-card';
+    card.onclick = () => runTC(tc);
+    card.innerHTML = `
+      <div class="tc-label">${tc.id} — ${tc.label}</div>
+      <div class="tc-desc">${tc.desc}</div>
+      <div class="tc-arr">Input: [${tc.input.slice(0,5).join(', ')}${tc.input.length > 5 ? '…' : ''}]</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function runTC(tc) {
+  const err = kiemTraDauVao(tc.input);
+  const tcResult = document.getElementById('tc-result');
+  tcResult.className = '';
+
+  if (tc.expected === 'ERROR') {
+    if (err) {
+      tcResult.innerHTML = `
+        <div class="msg msg-success">
+          ✅ <strong>${tc.id}</strong> PASS — Validator hoạt động đúng!<br>
+          <span style="font-family:monospace;font-size:12px">${err}</span>
+        </div>`;
+    } else {
+      tcResult.innerHTML = `<div class="msg msg-error">❌ <strong>${tc.id}</strong> FAIL — Validator không từ chối dữ liệu sai</div>`;
+    }
+    return;
+  }
+
+  if (err) {
+    tcResult.innerHTML = `<div class="msg msg-error">❌ <strong>${tc.id}</strong> FAIL — ${err}</div>`;
+    return;
+  }
+
+  const { sorted } = radixCoAm(tc.input);
+  const pass = JSON.stringify(sorted) === JSON.stringify(tc.expected);
+
+  if (pass) {
+    // Also run in demo area
+    document.getElementById('arr-input').value = tc.input.join(', ');
+    runSort();
+    tcResult.innerHTML = `
+      <div class="msg msg-success">
+        ✅ <strong>${tc.id}</strong> (${tc.label}) PASS<br>
+        <span style="font-size:12px">Expected: [${tc.expected.join(', ')}] &nbsp;|&nbsp; Got: [${sorted.join(', ')}]</span>
+      </div>`;
+  } else {
+    tcResult.innerHTML = `
+      <div class="msg msg-error">
+        ❌ <strong>${tc.id}</strong> FAIL<br>
+        Expected: [${tc.expected.join(', ')}]<br>
+        Got:      [${sorted.join(', ')}]
+      </div>`;
+  }
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+buildTestCards();
+// Auto-run VD01 on load
+setTimeout(() => runSort(), 100);
+</script>
+</body>
+</html>
