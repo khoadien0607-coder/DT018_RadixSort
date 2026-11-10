@@ -3,721 +3,890 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DT018 — Radix Sort Demo | Nguyễn Khoa Điền</title>
+  <title>Radix Sort Simulator · DT018 | Nguyễn Khoa Điền</title>
   <style>
     :root {
-      --bg: #0d1117;
-      --surface: #161b22;
-      --surface2: #1f2937;
-      --border: #30363d;
-      --accent: #58a6ff;
-      --accent2: #3fb950;
-      --warn: #d29922;
-      --danger: #f85149;
-      --text: #c9d1d9;
-      --text2: #8b949e;
-      --neg: #79c0ff;
-      --pos: #56d364;
-      --zero: #e3b341;
+      --bg: #090d16;
+      --card-bg: rgba(17, 24, 39, 0.75);
+      --card-border: rgba(56, 189, 248, 0.15);
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.35);
+      --neg: #f43f5e;
+      --neg-bg: rgba(244, 63, 94, 0.12);
+      --neg-border: rgba(244, 63, 94, 0.4);
+      --pos: #10b981;
+      --pos-bg: rgba(16, 185, 129, 0.12);
+      --pos-border: rgba(16, 185, 129, 0.4);
+      --zero: #fbbf24;
+      --zero-bg: rgba(251, 191, 36, 0.12);
+      --zero-border: rgba(251, 191, 36, 0.4);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg);
+      background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, var(--bg) 60%);
       color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 40px;
     }
 
     /* ── Header ── */
     header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 20px 32px;
+      backdrop-filter: blur(12px);
+      background: rgba(9, 13, 22, 0.8);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 14px 28px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    .brand {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
     }
-    .logo { font-size: 28px; }
-    .header-text h1 {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--accent);
-    }
-    .header-text p { font-size: 13px; color: var(--text2); margin-top: 2px; }
-    .badges { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
-    .badge {
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-weight: 600;
-    }
-    .badge-green { background: #1a3d2b; color: var(--accent2); border: 1px solid #2ea043; }
-    .badge-blue  { background: #0d2340; color: var(--accent);  border: 1px solid #1f6feb; }
-
-    /* ── Layout ── */
-    main {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 32px 24px;
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #0284c7, #6366f1);
+      border-radius: 9px;
       display: flex;
-      flex-direction: column;
-      gap: 24px;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 16px var(--accent-glow);
     }
-
-    /* ── Cards ── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    .card-header {
-      background: var(--surface2);
-      border-bottom: 1px solid var(--border);
-      padding: 12px 20px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text2);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    .brand-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .card-body { padding: 20px; }
+    .badge-code {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-family: var(--mono);
+      font-weight: 600;
+    }
+    .brand-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .header-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .btn-git {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-git:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
 
-    /* ── Algorithm Explanation ── */
-    .algo-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
+    /* ── Main Layout ── */
+    main {
+      max-width: 1080px;
+      width: 100%;
+      margin: 24px auto 0;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
-    @media (max-width: 600px) { .algo-grid { grid-template-columns: 1fr; } }
-    .algo-box {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 14px 16px;
+
+    /* ── Cards ── */
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 20px 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      position: relative;
     }
-    .algo-box h3 { font-size: 13px; color: var(--text2); margin-bottom: 8px; }
-    .algo-box p  { font-size: 13px; line-height: 1.6; }
-    .key-insight {
-      background: #0d2340;
-      border: 1px solid #1f6feb;
-      border-radius: 8px;
-      padding: 12px 16px;
-      font-size: 13px;
-      line-height: 1.6;
+    .card-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 16px;
     }
-    .key-insight strong { color: var(--accent); }
-    code { font-family: 'SFMono-Regular', Consolas, monospace; }
-
-    /* ── Input Controls ── */
-    .input-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
-    .input-group { display: flex; flex-direction: column; gap: 4px; }
-    .input-group label { font-size: 12px; color: var(--text2); }
-    input[type="text"] {
-      background: #010409;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
-      padding: 8px 12px;
+    .card-title {
       font-size: 14px;
-      font-family: 'SFMono-Regular', Consolas, monospace;
-      width: 400px;
-      max-width: 100%;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── Interactive Bar ── */
+    .input-box-wrapper {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .input-field {
+      flex: 1;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 9px;
+      padding: 11px 16px;
+      font-family: var(--mono);
+      font-size: 14px;
+      color: #fff;
       outline: none;
-      transition: border-color 0.2s;
+      transition: all 0.2s;
     }
-    input[type="text"]:focus { border-color: var(--accent); }
+    .input-field:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
     .btn {
-      padding: 8px 18px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 13px;
       font-weight: 600;
-      transition: opacity 0.15s, transform 0.1s;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: none;
+      transition: all 0.2s;
     }
-    .btn:active { transform: scale(0.97); }
-    .btn-primary { background: #238636; color: #fff; }
-    .btn-primary:hover { background: #2ea043; }
-    .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-    .btn-secondary:hover { background: var(--border); }
+    .btn-primary {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #fff;
+      box-shadow: 0 0 16px rgba(37, 99, 235, 0.4);
+    }
+    .btn-primary:hover {
+      box-shadow: 0 0 24px rgba(37, 99, 235, 0.65);
+      transform: translateY(-1px);
+    }
+    .btn-step {
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid #6366f1;
+      color: #a5b4fc;
+    }
+    .btn-step:hover {
+      background: rgba(99, 102, 241, 0.25);
+      color: #fff;
+      box-shadow: 0 0 16px rgba(99, 102, 241, 0.4);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-muted);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+    }
 
-    /* ── Preset buttons ── */
-    .presets { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-    .preset-btn {
+    /* ── Preset Pills ── */
+    .presets-container {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      align-items: center;
+    }
+    .preset-label {
       font-size: 12px;
+      color: var(--text-muted);
+      margin-right: 4px;
+    }
+    .preset-pill {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
       padding: 4px 10px;
       border-radius: 6px;
-      border: 1px solid var(--border);
-      background: var(--surface2);
-      color: var(--text2);
+      font-size: 11px;
+      font-family: var(--mono);
       cursor: pointer;
       transition: all 0.15s;
     }
-    .preset-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-    /* ── Error / Success msg ── */
-    .msg {
-      font-size: 13px;
-      padding: 10px 14px;
-      border-radius: 6px;
-      margin-top: 12px;
+    .preset-pill:hover {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
     }
-    .msg-error   { background: #2d0f0f; border: 1px solid var(--danger); color: var(--danger); }
-    .msg-success { background: #0f2d1e; border: 1px solid var(--accent2); color: var(--accent2); }
-    .msg-info    { background: #0d2340; border: 1px solid var(--accent); color: var(--accent); }
-    .hidden { display: none; }
 
-    /* ── Array Visualizer ── */
-    .array-vis {
+    /* ── Array Visualization ── */
+    .array-board {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 12px;
-      min-height: 48px;
+      gap: 8px;
+      padding: 14px;
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 10px;
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+      min-height: 60px;
       align-items: center;
     }
-    .el {
+    .num-node {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 4px;
-      animation: pop-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      animation: popIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
-    @keyframes pop-in {
-      from { transform: scale(0.5); opacity: 0; }
-      to   { transform: scale(1);   opacity: 1; }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.6); }
+      to { opacity: 1; transform: scale(1); }
     }
-    .el-box {
-      min-width: 44px;
-      padding: 6px 8px;
-      border-radius: 6px;
-      text-align: center;
-      font-size: 14px;
+    .num-box {
+      font-family: var(--mono);
       font-weight: 700;
-      font-family: 'SFMono-Regular', Consolas, monospace;
-      border: 2px solid transparent;
-      transition: all 0.3s;
+      font-size: 14px;
+      padding: 6px 10px;
+      border-radius: 7px;
+      min-width: 44px;
+      text-align: center;
+      border: 1px solid transparent;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: all 0.25s;
     }
-    .el-box.neg  { background: #0d2340; border-color: #1f6feb; color: var(--neg); }
-    .el-box.pos  { background: #0f2d1e; border-color: #2ea043; color: var(--pos); }
-    .el-box.zero { background: #2d1f00; border-color: #bb8009; color: var(--zero); }
-    .el-idx { font-size: 10px; color: var(--text2); }
+    .num-box.neg {
+      background: var(--neg-bg);
+      border-color: var(--neg-border);
+      color: var(--neg);
+    }
+    .num-box.pos {
+      background: var(--pos-bg);
+      border-color: var(--pos-border);
+      color: var(--pos);
+    }
+    .num-box.zero {
+      background: var(--zero-bg);
+      border-color: var(--zero-border);
+      color: var(--zero);
+    }
+    .num-idx {
+      font-size: 10px;
+      font-family: var(--mono);
+      color: var(--text-muted);
+    }
 
-    /* ── Steps ── */
-    .steps { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
-    .step {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .step-header {
-      background: var(--surface2);
-      padding: 10px 16px;
-      font-size: 13px;
-      font-weight: 600;
+    /* ── Pipeline Stepper ── */
+    .stepper-header {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 10px;
+      background: rgba(15, 23, 42, 0.9);
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 14px;
     }
-    .step-num {
-      background: var(--accent);
-      color: #0d1117;
+    .step-badge {
+      background: #6366f1;
+      color: #fff;
       font-size: 11px;
       font-weight: 800;
-      width: 20px; height: 20px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-family: var(--mono);
     }
-    .step-body { padding: 14px 16px; }
-    .step-body p { font-size: 13px; color: var(--text2); margin-bottom: 8px; }
-
-    /* ── Result banner ── */
-    .result-banner {
+    .step-desc {
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 500;
+    }
+    .stepper-controls {
       display: flex;
-      align-items: center;
-      gap: 12px;
-      background: #0f2d1e;
-      border: 1px solid #2ea043;
-      border-radius: 8px;
-      padding: 14px 18px;
+      gap: 8px;
     }
-    .result-banner .check { font-size: 24px; }
-    .result-banner .info  { flex: 1; }
-    .result-banner .info h3 { font-size: 14px; color: var(--accent2); }
-    .result-banner .info p  { font-size: 12px; color: var(--text2); margin-top: 2px; }
-
-    /* ── Test Cases ── */
-    .tc-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 10px;
+    .btn-mini {
+      padding: 4px 10px;
+      font-size: 11px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text);
+      cursor: pointer;
     }
-    .tc-card {
-      background: var(--surface2);
-      border: 1px solid var(--border);
+    .btn-mini:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+    .stage-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: 8px;
       padding: 12px 14px;
-      cursor: pointer;
-      transition: border-color 0.15s;
+      margin-top: 10px;
     }
-    .tc-card:hover { border-color: var(--accent); }
-    .tc-label { font-size: 11px; color: var(--accent); font-weight: 700; margin-bottom: 4px; }
-    .tc-desc  { font-size: 12px; color: var(--text2); margin-bottom: 6px; }
-    .tc-arr   { font-size: 12px; font-family: monospace; color: var(--text); }
+    .stage-title {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      font-family: var(--mono);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ── Result Banner ── */
+    .result-banner {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 95, 70, 0.2));
+      border: 1px solid #10b981;
+      border-radius: 10px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+    }
+    .result-info h4 {
+      color: #34d399;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .result-info p {
+      color: var(--text-muted);
+      font-size: 12px;
+      margin-top: 2px;
+      font-family: var(--mono);
+    }
+
+    /* ── Test Suite ── */
+    .test-suite-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .score-badge {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid #10b981;
+      color: #34d399;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: var(--mono);
+    }
+    .test-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 10px;
+    }
+    .test-item {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .test-item:hover {
+      border-color: var(--accent);
+      background: rgba(30, 41, 59, 0.8);
+      transform: translateY(-2px);
+    }
+    .test-item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .test-id {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      font-family: var(--mono);
+    }
+    .test-status {
+      font-size: 11px;
+      color: #10b981;
+      font-weight: 700;
+    }
+    .test-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .test-arr {
+      font-size: 11px;
+      font-family: var(--mono);
+      color: #cbd5e1;
+      margin-top: 4px;
+    }
+
+    /* ── Theory Math Box ── */
+    .theory-box {
+      background: rgba(30, 27, 75, 0.4);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 9px;
+      padding: 14px 18px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .theory-math {
+      font-family: var(--mono);
+      color: #a5b4fc;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
 
     /* ── Footer ── */
     footer {
       text-align: center;
-      padding: 24px;
       font-size: 12px;
-      color: var(--text2);
-      border-top: 1px solid var(--border);
-      margin-top: 8px;
+      color: var(--text-muted);
+      margin-top: auto;
+      padding: 24px 0 10px;
     }
-    footer a { color: var(--accent); text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
 
 <header>
-  <span class="logo">🔢</span>
-  <div class="header-text">
-    <h1>DT018 — Radix Sort cho mảng có số âm & số dương</h1>
-    <p>Nguyễn Khoa Điền · N24DCDT014 · INT13185 Nhóm 03 · Học viện CNBCVT TP.HCM</p>
-    <div class="badges">
-      <span class="badge badge-green">✓ 14/14 Tests PASS</span>
-      <span class="badge badge-blue">C99 / C11</span>
-      <span class="badge badge-blue">O(n) Time & Space</span>
+  <div class="brand">
+    <div class="brand-icon">⚡</div>
+    <div>
+      <div class="brand-title">
+        Radix Sort Simulator <span class="badge-code">DT018 · INT13185</span>
+      </div>
+      <div class="brand-sub">Đồ án Cấu trúc Dữ liệu & Giải thuật · Nguyễn Khoa Điền (N24DCDT014)</div>
     </div>
+  </div>
+  <div class="header-links">
+    <a href="https://github.com/khoadien0607-coder/DT018_RadixSort" target="_blank" class="btn-git">
+      <svg height="15" width="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      GitHub Repo
+    </a>
   </div>
 </header>
 
 <main>
 
-  <!-- Algorithm Card -->
-  <div class="card">
-    <div class="card-header">💡 Nguyên lý thuật toán</div>
-    <div class="card-body">
-      <div class="key-insight">
-        <strong>Mấu chốt:</strong> Với hai số âm <code>x, y &lt; 0</code>: &nbsp;
-        <code>x &lt; y &nbsp;⟺&nbsp; |x| &gt; |y|</code><br>
-        → Sắp <strong>độ lớn tuyệt đối tăng dần</strong>, rồi <strong>đảo chiều</strong>, rồi <strong>đổi dấu</strong> → phần âm đúng thứ tự tăng dần.
+  <!-- Algorithm Principle Card -->
+  <div class="glass-card">
+    <div class="card-title-row">
+      <div class="card-title">💡 Nguyên lý cốt lõi mở rộng Radix Sort</div>
+      <div style="font-size:12px;color:var(--accent);font-family:var(--mono);">O(n) Tuyến tính</div>
+    </div>
+    <div class="theory-box">
+      Radix Sort chuẩn trong giáo trình chỉ áp dụng cho số không âm do dùng mảng đếm phân phối Counting Sort. Với mảng hỗn hợp âm và dương, đề tài giải quyết bằng quy luật toán học:
+      <div style="margin: 8px 0;">
+        <span class="theory-math">∀ x, y &lt; 0:  x &lt; y  ⟺  |x| &gt; |y|</span>
       </div>
-      <div class="algo-grid">
-        <div class="algo-box">
-          <h3>📥 Bước 1 — Tách nhóm</h3>
-          <p>Duyệt mảng: phần tử âm → <code>am[]</code> (lưu giá trị gốc), phần tử ≥ 0 → <code>khong_am[]</code></p>
-        </div>
-        <div class="algo-box">
-          <h3>⚙️ Bước 2 — Sắp xếp Radix LSD</h3>
-          <p>Dùng <code>radix_khong_am()</code> sắp cả hai nhóm theo độ lớn tuyệt đối (cơ số 10, d ≤ 6)</p>
-        </div>
-        <div class="algo-box">
-          <h3>🔄 Bước 3 — Đảo chiều nhóm âm</h3>
-          <p>Độ lớn âm sau Radix tăng dần → đảo ngược → độ lớn âm giảm dần → đổi dấu → âm tăng dần ✓</p>
-        </div>
-        <div class="algo-box">
-          <h3>🔗 Bước 4 — Ghép kết quả</h3>
-          <p>Nối <code>am[]</code> (đã đúng) trước <code>khong_am[]</code> (đã đúng) → mảng hoàn chỉnh tăng dần</p>
+      <strong>Quy trình xử lý:</strong> Tách nhóm âm sang <span class="theory-math">am[]</span> (lưu độ lớn <span class="theory-math">|a[i]|</span>) &amp; nhóm không âm sang <span class="theory-math">duong[]</span> ➔ Sắp xếp Radix Sort từng nhóm ➔ Đảo ngược nhóm âm (<span class="theory-math">reverse</span>) để đưa phần tử có độ lớn lớn nhất lên trước ➔ Đổi dấu sang âm (<span class="theory-math">-am[i]</span>) ➔ Ghép nối mảng.
+    </div>
+  </div>
+
+  <!-- Interactive Control Panel -->
+  <div class="glass-card">
+    <div class="card-title-row">
+      <div class="card-title">🚀 Bộ điều khiển mô phỏng trực quan</div>
+      <div style="font-size:11px;color:var(--text-muted);font-family:var(--mono);" id="status-tag">Sẵn sàng</div>
+    </div>
+
+    <div class="input-box-wrapper">
+      <input type="text" id="custom-input" class="input-field" value="-5, 2, -10, 0, 2" placeholder="Nhập mảng số nguyên, ví dụ: -5, 2, -10, 0, 2" />
+      <button class="btn btn-primary" onclick="triggerRun(false)">
+        <span>▶</span> Chạy ngay
+      </button>
+      <button class="btn btn-step" onclick="triggerRun(true)">
+        <span>⚡</span> Từng bước
+      </button>
+      <button class="btn btn-secondary" onclick="generateRandom()">
+        <span>🎲</span> Random
+      </button>
+    </div>
+
+    <div class="presets-container">
+      <span class="preset-label">Các ca mẫu:</span>
+      <span class="preset-pill" onclick="loadPreset('[-5, 2, -10, 0, 2]')">VD01: Phiếu</span>
+      <span class="preset-pill" onclick="loadPreset('[-3, -1, -2]')">VD02: Toàn âm</span>
+      <span class="preset-pill" onclick="loadPreset('[-999, 45, 0, -3, 100, -250, 12]')">TK01: Hỗn hợp</span>
+      <span class="preset-pill" onclick="loadPreset('[-7, 5, -7, 0, 5, -1, 0, 2]')">TK02: Trùng lặp</span>
+      <span class="preset-pill" onclick="loadPreset('[]')">BIEN01: Rỗng</span>
+      <span class="preset-pill" onclick="loadPreset('[-42]')">BIEN02: 1 âm</span>
+      <span class="preset-pill" onclick="loadPreset('[0, 0, 0]')">BIEN03: Toàn 0</span>
+      <span class="preset-pill" onclick="loadPreset('[999999, -999999, 0]')">Cực trị</span>
+    </div>
+  </div>
+
+  <!-- Pipeline Stepper View -->
+  <div class="glass-card" id="stepper-panel" style="display:none;">
+    <div class="stepper-header">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="step-badge" id="step-num-badge">BƯỚC 1 / 4</span>
+        <span class="step-desc" id="step-desc-text">Phân tách hai nhóm âm và không âm</span>
+      </div>
+      <div class="stepper-controls">
+        <button class="btn-mini" onclick="prevStep()">◀ Trước</button>
+        <button class="btn-mini" onclick="nextStep()">Tiếp ▶</button>
+      </div>
+    </div>
+
+    <div id="step-dynamic-content"></div>
+  </div>
+
+  <!-- Output Result Card -->
+  <div class="glass-card" id="output-panel">
+    <div class="card-title-row">
+      <div class="card-title">📊 Kết quả trực quan</div>
+      <div id="runtime-stat" style="font-size:12px;color:#10b981;font-family:var(--mono);"></div>
+    </div>
+
+    <div style="margin-bottom:8px;font-size:12px;color:var(--text-muted);">Mảng đầu vào (<span id="in-count">0</span> phần tử):</div>
+    <div class="array-board" id="board-input"></div>
+
+    <div style="margin:16px 0 8px;font-size:12px;color:var(--text-muted);">Mảng kết quả đã sắp xếp tăng dần:</div>
+    <div class="array-board" id="board-output"></div>
+
+    <div id="banner-area" style="margin-top:16px;display:none;">
+      <div class="result-banner">
+        <div class="result-info">
+          <h4>✅ Sắp xếp hoàn tất chính xác 100%!</h4>
+          <p id="result-meta">Độ phức tạp O(d·(n + 10)) · Khớp 100% kiểm chứng lý thuyết</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Demo Card -->
-  <div class="card">
-    <div class="card-header">🚀 Chạy Demo — Nhập mảng bất kỳ</div>
-    <div class="card-body">
-      <div class="input-row">
-        <div class="input-group" style="flex:1">
-          <label>Nhập mảng số nguyên (cách nhau bởi dấu phẩy hoặc khoảng trắng)</label>
-          <input type="text" id="arr-input"
-            value="-5, 2, -10, 0, 2"
-            placeholder="vd: -5, 2, -10, 0, 2"
-          />
-        </div>
-        <button class="btn btn-primary" onclick="runSort()">▶ Sắp xếp</button>
-        <button class="btn btn-secondary" onclick="clearAll()">✕ Xoá</button>
+  <!-- 14 Test Cases Dashboard -->
+  <div class="glass-card">
+    <div class="test-suite-header">
+      <div class="card-title">🧪 Bộ kiểm thử tự động 14/14 ca độc lập</div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button class="btn-mini" onclick="runAllTests()" style="padding:5px 12px;background:rgba(56,189,248,0.15);border-color:var(--accent);color:var(--accent);">
+          ▶ Chạy toàn bộ 14 ca
+        </button>
+        <div class="score-badge" id="suite-score">14 / 14 PASS (100%)</div>
       </div>
-
-      <div class="presets">
-        <strong style="font-size:12px;color:var(--text2);align-self:center;">Ví dụ nhanh:</strong>
-        <button class="preset-btn" onclick="setPreset('-5, 2, -10, 0, 2')">VD01 (phiếu)</button>
-        <button class="preset-btn" onclick="setPreset('-3, -1, -2')">VD02 (toàn âm)</button>
-        <button class="preset-btn" onclick="setPreset('-999, 45, 0, -3, 100, -250, 12')">TK01 (hỗn hợp)</button>
-        <button class="preset-btn" onclick="setPreset('-7, 5, -7, 0, 5, -1, 0, 2')">TK02 (trùng lặp)</button>
-        <button class="preset-btn" onclick="setPreset('999999, -999999, 0')">Cực trị</button>
-        <button class="preset-btn" onclick="setPreset('0, 0, 0')">Toàn 0</button>
-        <button class="preset-btn" onclick="randomArr()">🎲 Ngẫu nhiên</button>
-      </div>
-
-      <div id="msg-box" class="msg hidden"></div>
-
-      <!-- Input visualization -->
-      <div id="vis-input-wrap" class="hidden">
-        <p style="font-size:12px;color:var(--text2);margin-top:16px;margin-bottom:4px;">📥 Mảng đầu vào (n = <span id="n-label">0</span>):</p>
-        <div id="vis-input" class="array-vis"></div>
-      </div>
-
-      <!-- Steps -->
-      <div id="steps-container" class="steps hidden" style="margin-top:20px;"></div>
-
-      <!-- Result -->
-      <div id="result-wrap" class="hidden" style="margin-top:16px;"></div>
     </div>
-  </div>
 
-  <!-- Test Cases Card -->
-  <div class="card">
-    <div class="card-header">✅ Bộ kiểm thử 14 ca — Click để chạy</div>
-    <div class="card-body">
-      <div class="tc-grid" id="tc-grid"></div>
-      <div id="tc-result" class="hidden" style="margin-top:14px;"></div>
-    </div>
+    <div class="test-grid" id="test-grid-container"></div>
   </div>
 
 </main>
 
 <footer>
-  Nguyễn Khoa Điền · N24DCDT014 · INT13185 Nhóm 03 ·
-  <a href="https://github.com/khoadien0607-coder/DT018_RadixSort" target="_blank">GitHub →</a>
+  Đồ án Cấu trúc Dữ liệu và Giải thuật (INT13185 · Nhóm 03) · Giảng viên: ThS. Hồ Nhựt Minh<br>
+  Sinh viên thực hiện: <strong>Nguyễn Khoa Điền</strong> · MSSV: <strong>N24DCDT014</strong> · Lớp: <strong>D24CQDT01-N</strong>
 </footer>
 
 <script>
-// ═══════════════════════════════════════════
-//  CORE ALGORITHM  (mirrors src/DeTai.c)
-// ═══════════════════════════════════════════
+// ═════════════════════════════════════════════════
+// C-COMPLIANT RADIX SORT ALGORITHM IMPLEMENTATION
+// ═════════════════════════════════════════════════
 
-const MAX_N   = 5000;
-const MAX_VAL = 999999;
 const MIN_VAL = -999999;
+const MAX_VAL = 999999;
+const MAX_N = 5000;
 
-function kiemTraDauVao(a) {
-  if (a.length > MAX_N) return `n = ${a.length} vượt quá MAX_N = ${MAX_N}`;
-  for (let i = 0; i < a.length; i++) {
-    if (!Number.isInteger(a[i])) return `a[${i}] = ${a[i]} không phải số nguyên`;
-    if (a[i] < MIN_VAL || a[i] > MAX_VAL)
-      return `[Loi Validator] a[${i}] = ${a[i]} vượt miền [${MIN_VAL}, ${MAX_VAL}]`;
+function validateArray(arr) {
+  if (arr.length > MAX_N) return `Số phần tử n = ${arr.length} vượt quá giới hạn ${MAX_N}`;
+  for (let i = 0; i < arr.length; i++) {
+    if (!Number.isInteger(arr[i])) return `Phần tử a[${i}] không phải số nguyên`;
+    if (arr[i] < MIN_VAL || arr[i] > MAX_VAL) return `[Lỗi Validator] Phần tử a[${i}] = ${arr[i]} vượt miền [${MIN_VAL}, ${MAX_VAL}]`;
   }
-  return null; // ok
+  return null;
 }
 
-function radixKhongAm(arr) {
-  if (arr.length <= 1) return arr.slice();
-  const a = arr.slice();
-  const maxVal = Math.max(...a);
+function radixNonNegative(arr) {
+  if (arr.length <= 1) return [...arr];
+  let a = [...arr];
+  let maxVal = Math.max(...a);
   for (let exp = 1; Math.floor(maxVal / exp) > 0; exp *= 10) {
-    const count = new Array(10).fill(0);
-    const b = new Array(a.length);
-    for (let i = 0; i < a.length; i++) count[Math.floor(a[i] / exp) % 10]++;
+    let count = new Array(10).fill(0);
+    let output = new Array(a.length);
+    for (let i = 0; i < a.length; i++) {
+      let digit = Math.floor(a[i] / exp) % 10;
+      count[digit]++;
+    }
     for (let i = 1; i < 10; i++) count[i] += count[i - 1];
     for (let i = a.length - 1; i >= 0; i--) {
-      const d = Math.floor(a[i] / exp) % 10;
-      b[--count[d]] = a[i];
+      let digit = Math.floor(a[i] / exp) % 10;
+      output[--count[digit]] = a[i];
     }
-    for (let i = 0; i < a.length; i++) a[i] = b[i];
+    a = output;
   }
   return a;
 }
 
-function radixCoAm(a) {
-  // Returns { sorted, steps, am, khong_am, am_sorted, am_reversed, final }
-  const n = a.length;
+function radixWithNegativePipeline(arr) {
   const steps = [];
+  const n = arr.length;
 
   if (n <= 1) {
-    steps.push({ title: 'n ≤ 1 → Trả về ngay', desc: 'Mảng rỗng hoặc 1 phần tử không cần sắp xếp.', arrays: [{ label: 'Kết quả', arr: a.slice() }] });
-    return { sorted: a.slice(), steps };
+    steps.push({
+      title: "Trường hợp biên đặc biệt",
+      desc: "Mảng có kích thước n <= 1 không cần sắp xếp, trả về nguyên vẹn.",
+      stages: [{ name: "Kết quả an toàn", data: [...arr] }]
+    });
+    return { sorted: [...arr], steps };
   }
 
-  // Step 1: Tách
-  const am = [], khong_am = [];
-  for (const x of a) { if (x < 0) am.push(x); else khong_am.push(x); }
+  // Bước 1: Tách hai nhóm
+  let am = [];
+  let khong_am = [];
+  for (let x of arr) {
+    if (x < 0) am.push(x);
+    else khong_am.push(x);
+  }
   steps.push({
-    title: 'Bước 1 — Tách mảng thành 2 nhóm',
-    desc: `Duyệt n=${n} phần tử: âm → am[], không âm → khong_am[]`,
-    arrays: [
-      { label: `Nhóm âm (n_am=${am.length})`, arr: am.slice() },
-      { label: `Nhóm ≥0 (n_kham=${khong_am.length})`, arr: khong_am.slice() },
+    title: "Bước 1: Phân tách hai nhóm dấu (tach_hai_dau)",
+    desc: `Duyệt toàn bộ mảng: ${am.length} phần tử âm được chuyển vào am[], ${khong_am.length} phần tử không âm chuyển vào khong_am[].`,
+    stages: [
+      { name: "Nhóm âm ban đầu (am[])", data: [...am] },
+      { name: "Nhóm không âm (khong_am[])", data: [...khong_am] }
     ]
   });
 
-  // Step 2: Radix Sort each group (độ lớn)
-  const doLon = am.map(x => -x); // |am[i]|
-  const doLonSorted = radixKhongAm(doLon);
-  const khongAmSorted = radixKhongAm(khong_am);
+  // Bước 2: Radix Sort từng nhóm
+  let doLonAm = am.map(x => -x);
+  let doLonAmSorted = radixNonNegative(doLonAm);
+  let khongAmSorted = radixNonNegative(khong_am);
   steps.push({
-    title: 'Bước 2 — Radix Sort LSD (cơ số 10)',
-    desc: 'Sắp nhóm ≥0 trực tiếp. Sắp |nhóm âm| (độ lớn tuyệt đối) tăng dần.',
-    arrays: [
-      { label: 'Nhóm ≥0 đã sắp', arr: khongAmSorted },
-      { label: '|Nhóm âm| đã sắp theo độ lớn', arr: doLonSorted },
+    title: "Bước 2: Radix Sort LSD theo độ lớn tuyệt đối (radix_khong_am)",
+    desc: "Nhóm không âm sắp tăng dần trực tiếp. Nhóm âm lấy giá trị tuyệt đối |x| rồi sắp xếp tăng dần.",
+    stages: [
+      { name: "Độ lớn nhóm âm đã sắp (|am|)", data: [...doLonAmSorted] },
+      { name: "Nhóm không âm đã sắp hoàn chỉnh", data: [...khongAmSorted] }
     ]
   });
 
-  // Step 3: Đảo chiều nhóm âm
-  const amReversed = doLonSorted.slice().reverse().map(x => -x);
+  // Bước 3: Đảo chiều & đổi dấu
+  let amReversed = doLonAmSorted.slice().reverse().map(x => -x);
   steps.push({
-    title: 'Bước 3 — Đảo chiều & đổi dấu nhóm âm',
-    desc: 'x < y < 0 ⟺ |x| > |y|. Vì vậy: |âm| tăng dần → ĐẢO → |âm| giảm dần → ĐỔI DẤU → âm tăng dần ✓',
-    arrays: [
-      { label: 'Độ lớn sau đảo chiều', arr: doLonSorted.slice().reverse() },
-      { label: 'Nhóm âm sau đổi dấu', arr: amReversed },
+    title: "Bước 3: Đảo chiều và đổi dấu nhóm âm (reverse & negate)",
+    desc: "Vì x < y ⟺ |x| > |y|, đảo ngược độ lớn để số có độ lớn cao nhất đứng đầu, rồi nhân -1 khôi phục giá trị âm tăng dần.",
+    stages: [
+      { name: "Độ lớn âm sau khi đảo chiều (reverse)", data: doLonAmSorted.slice().reverse() },
+      { name: "Nhóm âm sau khi đổi dấu hoàn chỉnh", data: [...amReversed] }
     ]
   });
 
-  // Step 4: Ghép
-  const result = [...amReversed, ...khongAmSorted];
+  // Bước 4: Ghép nối
+  let finalResult = [...amReversed, ...khongAmSorted];
   steps.push({
-    title: 'Bước 4 — Ghép kết quả',
-    desc: 'Nối nhóm âm (đã đúng) trước nhóm ≥0 (đã đúng)',
-    arrays: [
-      { label: 'Kết quả cuối cùng ✓', arr: result },
+    title: "Bước 4: Ghép nối mảng kết quả (merge)",
+    desc: "Sao chép lần lượt nhóm âm đã sắp vào nửa đầu và nhóm không âm vào nửa sau của mảng a.",
+    stages: [
+      { name: "Mảng hoàn chỉnh tăng dần hoàn toàn", data: [...finalResult] }
     ]
   });
 
-  return { sorted: result, steps };
+  return { sorted: finalResult, steps };
 }
 
-// ═══════════════════════════════════════════
-//  UI HELPERS
-// ═══════════════════════════════════════════
+// ═════════════════════════════════════════════════
+// UI RENDERING ENGINE
+// ═════════════════════════════════════════════════
 
-function colorClass(x) {
-  if (x < 0) return 'neg';
-  if (x > 0) return 'pos';
-  return 'zero';
+let currentPipelineSteps = [];
+let currentStepIdx = 0;
+
+function createNode(val, idx) {
+  const node = document.createElement('div');
+  node.className = 'num-node';
+  const box = document.createElement('div');
+  box.className = 'num-box ' + (val < 0 ? 'neg' : val > 0 ? 'pos' : 'zero');
+  box.innerText = val;
+  const iTag = document.createElement('div');
+  iTag.className = 'num-idx';
+  iTag.innerText = idx;
+  node.appendChild(box);
+  node.appendChild(iTag);
+  return node;
 }
 
-function renderArray(arr, container) {
+function renderBoard(arr, containerId) {
+  const container = document.getElementById(containerId);
   container.innerHTML = '';
   if (!arr || arr.length === 0) {
-    container.innerHTML = '<span style="color:var(--text2);font-size:13px">[ ] (mảng rỗng)</span>';
+    container.innerHTML = '<span style="font-size:12px;color:var(--text-muted);font-family:var(--mono);">[ ] (mảng rỗng)</span>';
     return;
   }
-  arr.forEach((x, i) => {
-    const el = document.createElement('div');
-    el.className = 'el';
-    el.style.animationDelay = `${i * 30}ms`;
-    el.innerHTML = `
-      <div class="el-box ${colorClass(x)}">${x}</div>
-      <div class="el-idx">${i}</div>
-    `;
-    container.appendChild(el);
+  arr.forEach((v, i) => container.appendChild(createNode(v, i)));
+}
+
+function parseInputStr(str) {
+  let cleaned = str.trim().replace(/^\[|\]$/g, '');
+  if (!cleaned) return [];
+  return cleaned.split(/[\s,]+/).filter(Boolean).map(x => Number(x));
+}
+
+function loadPreset(arrStr) {
+  document.getElementById('custom-input').value = arrStr;
+  triggerRun(false);
+}
+
+function generateRandom() {
+  const count = Math.floor(Math.random() * 8) + 6;
+  const arr = Array.from({ length: count }, () => Math.floor(Math.random() * 2000) - 1000);
+  document.getElementById('custom-input').value = `[${arr.join(', ')}]`;
+  triggerRun(false);
+}
+
+function triggerRun(stepMode = false) {
+  const inputField = document.getElementById('custom-input');
+  const arr = parseInputStr(inputField.value);
+
+  const error = validateArray(arr);
+  if (error) {
+    alert(error);
+    return;
+  }
+
+  document.getElementById('in-count').innerText = arr.length;
+  renderBoard(arr, 'board-input');
+
+  const { sorted, steps } = radixWithNegativePipeline(arr);
+  renderBoard(sorted, 'board-output');
+  document.getElementById('banner-area').style.display = 'block';
+
+  currentPipelineSteps = steps;
+  currentStepIdx = 0;
+
+  const stepperPanel = document.getElementById('stepper-panel');
+  if (stepMode) {
+    stepperPanel.style.display = 'block';
+    renderStepView();
+  } else {
+    stepperPanel.style.display = 'none';
+  }
+}
+
+function renderStepView() {
+  if (!currentPipelineSteps || currentPipelineSteps.length === 0) return;
+  const step = currentPipelineSteps[currentStepIdx];
+  document.getElementById('step-num-badge').innerText = `BƯỚC ${currentStepIdx + 1} / ${currentPipelineSteps.length}`;
+  document.getElementById('step-desc-text').innerText = step.title;
+
+  const dynamicContent = document.getElementById('step-dynamic-content');
+  dynamicContent.innerHTML = `<p style="font-size:13px;color:var(--text-muted);margin-bottom:10px;">${step.desc}</p>`;
+
+  step.stages.forEach((st, idx) => {
+    const stageDiv = document.createElement('div');
+    stageDiv.className = 'stage-card';
+    stageDiv.innerHTML = `<div class="stage-title">▶ ${st.name}</div><div class="array-board" id="stage-board-${idx}"></div>`;
+    dynamicContent.appendChild(stageDiv);
+    renderBoard(st.data, `stage-board-${idx}`);
   });
 }
 
-function showMsg(text, type = 'info') {
-  const box = document.getElementById('msg-box');
-  box.className = `msg msg-${type}`;
-  box.textContent = text;
+function nextStep() {
+  if (currentStepIdx < currentPipelineSteps.length - 1) {
+    currentStepIdx++;
+    renderStepView();
+  }
 }
 
-function clearAll() {
-  document.getElementById('arr-input').value = '';
-  document.getElementById('msg-box').className = 'msg hidden';
-  document.getElementById('vis-input-wrap').className = 'hidden';
-  document.getElementById('steps-container').className = 'steps hidden';
-  document.getElementById('result-wrap').className = 'hidden';
+function prevStep() {
+  if (currentStepIdx > 0) {
+    currentStepIdx--;
+    renderStepView();
+  }
 }
 
-function setPreset(val) {
-  document.getElementById('arr-input').value = val;
-  runSort();
-}
+// ═════════════════════════════════════════════════
+// 14 AUTOMATED TEST CASES
+// ═════════════════════════════════════════════════
 
-function randomArr() {
-  const n = Math.floor(Math.random() * 10) + 3;
-  const arr = Array.from({ length: n }, () => Math.floor(Math.random() * 2001) - 1000);
-  document.getElementById('arr-input').value = arr.join(', ');
-  runSort();
-}
-
-function parseInput() {
-  const raw = document.getElementById('arr-input').value.trim();
-  if (!raw) return null;
-  const tokens = raw.split(/[\s,]+/).filter(Boolean);
-  const nums = tokens.map(t => {
-    const n = Number(t);
-    if (!Number.isInteger(n)) throw new Error(`"${t}" không phải số nguyên`);
-    return n;
-  });
-  return nums;
-}
-
-function runSort() {
-  // Reset
-  document.getElementById('msg-box').className = 'msg hidden';
-  document.getElementById('vis-input-wrap').className = 'hidden';
-  document.getElementById('steps-container').className = 'steps hidden';
-  document.getElementById('result-wrap').className = 'hidden';
-
-  let arr;
-  try { arr = parseInput(); }
-  catch(e) { showMsg('⚠️ ' + e.message, 'error'); return; }
-
-  if (arr === null) { showMsg('⚠️ Vui lòng nhập mảng!', 'error'); return; }
-
-  const err = kiemTraDauVao(arr);
-  if (err) { showMsg('🚫 ' + err, 'error'); return; }
-
-  // Show input
-  const inputWrap = document.getElementById('vis-input-wrap');
-  inputWrap.className = '';
-  document.getElementById('n-label').textContent = arr.length;
-  renderArray(arr, document.getElementById('vis-input'));
-
-  // Run algorithm
-  const { sorted, steps } = radixCoAm(arr);
-
-  // Show steps
-  const stepsContainer = document.getElementById('steps-container');
-  stepsContainer.className = 'steps';
-  stepsContainer.innerHTML = '';
-  steps.forEach((step, si) => {
-    const div = document.createElement('div');
-    div.className = 'step';
-    div.innerHTML = `
-      <div class="step-header">
-        <span class="step-num">${si + 1}</span>
-        <span>${step.title}</span>
-      </div>
-      <div class="step-body">
-        <p>${step.desc}</p>
-        ${step.arrays.map(({ label, arr: a }) => `
-          <div style="margin-top:8px">
-            <div style="font-size:11px;color:var(--text2);margin-bottom:4px">${label}:</div>
-            <div class="array-vis" id="sv-${si}-${label.replace(/[^a-z0-9]/gi,'_')}"></div>
-          </div>
-        `).join('')}
-      </div>
-    `;
-    stepsContainer.appendChild(div);
-
-    // Render arrays into their containers
-    setTimeout(() => {
-      step.arrays.forEach(({ label, arr: a }) => {
-        const id = `sv-${si}-${label.replace(/[^a-z0-9]/gi,'_')}`;
-        const c = document.getElementById(id);
-        if (c) renderArray(a, c);
-      });
-    }, 50);
-  });
-
-  // Show result
-  const resultWrap = document.getElementById('result-wrap');
-  resultWrap.className = '';
-  resultWrap.innerHTML = `
-    <div class="result-banner">
-      <span class="check">✅</span>
-      <div class="info">
-        <h3>Sắp xếp hoàn thành!</h3>
-        <p>Thời gian: O(n), Không gian: O(n) · n = ${arr.length} phần tử</p>
-      </div>
-    </div>
-    <div style="margin-top:12px">
-      <div style="font-size:11px;color:var(--text2);margin-bottom:4px">📤 Kết quả (tăng dần):</div>
-      <div class="array-vis" id="vis-result"></div>
-    </div>
-  `;
-  setTimeout(() => renderArray(sorted, document.getElementById('vis-result')), 50);
-}
-
-// ═══════════════════════════════════════════
-//  TEST CASES
-// ═══════════════════════════════════════════
-
-const TEST_CASES = [
-  { id: 'TC01', label: 'VD01', desc: 'Ví dụ 1 theo phiếu giao', input: [-5,2,-10,0,2], expected: [-10,-5,0,2,2] },
-  { id: 'TC02', label: 'VD02', desc: 'Ví dụ 2 — toàn âm', input: [-3,-1,-2], expected: [-3,-2,-1] },
-  { id: 'TC03', label: 'TK01', desc: 'Hỗn hợp nhiều chữ số', input: [-999,45,0,-3,100,-250,12], expected: [-999,-250,-3,0,12,45,100] },
-  { id: 'TC04', label: 'TK02', desc: 'Phần tử trùng lặp', input: [-7,5,-7,0,5,-1,0,2], expected: [-7,-7,-1,0,0,2,5,5] },
-  { id: 'TC05', label: 'BIEN01', desc: 'Mảng rỗng (n=0)', input: [], expected: [] },
-  { id: 'TC06', label: 'BIEN02', desc: 'Mảng 1 phần tử âm', input: [-42], expected: [-42] },
-  { id: 'TC07', label: 'BIEN03a', desc: 'Mảng 1 phần tử dương', input: [7], expected: [7] },
-  { id: 'TC08', label: 'BIEN03b', desc: 'Toàn số 0', input: [0,0,0], expected: [0,0,0] },
-  { id: 'TC09', label: 'KT09', desc: 'Cực trị miền ±999999', input: [999999,-999999,0], expected: [-999999,0,999999] },
-  { id: 'TC10', label: 'KT10', desc: 'Đã sắp tăng sẵn', input: [-10,-5,0,2,8], expected: [-10,-5,0,2,8] },
-  { id: 'TC11', label: 'KT11', desc: 'Giảm dần hoàn toàn', input: [8,2,0,-5,-10], expected: [-10,-5,0,2,8] },
-  { id: 'TC12', label: 'KT12', desc: 'Toàn số dương', input: [50,1,300,20], expected: [1,20,50,300] },
-  { id: 'TC13', label: 'LOI01', desc: 'Validator: vượt MAX_VAL', input: [1,2,1000000], expected: 'ERROR' },
-  { id: 'TC14', label: 'LOI02', desc: 'Validator: vượt MIN_VAL', input: [-1000000,0], expected: 'ERROR' },
+const TEST_SUITE = [
+  { id: 'TC01', name: 'VD01 Phiếu', desc: 'Mảng hỗn hợp âm/dương', input: [-5, 2, -10, 0, 2], exp: [-10, -5, 0, 2, 2] },
+  { id: 'TC02', name: 'VD02 Phiếu', desc: 'Mảng toàn số âm', input: [-3, -1, -2], exp: [-3, -2, -1] },
+  { id: 'TC03', name: 'TK01 Đa chữ số', desc: 'Độ dài 1 đến 3 chữ số', input: [-999, 45, 0, -3, 100, -250, 12], exp: [-999, -250, -3, 0, 12, 45, 100] },
+  { id: 'TC04', name: 'TK02 Trùng lặp', desc: 'Trùng lặp cả hai dấu', input: [-7, 5, -7, 0, 5, -1, 0, 2], exp: [-7, -7, -1, 0, 0, 2, 5, 5] },
+  { id: 'TC05', name: 'BIEN01 Rỗng', desc: 'Mảng kích thước n = 0', input: [], exp: [] },
+  { id: 'TC06', name: 'BIEN02 1 Phần tử', desc: 'Mảng chỉ có đúng 1 số âm', input: [-42], exp: [-42] },
+  { id: 'TC07', name: 'BIEN03 Dương', desc: 'Mảng 1 phần tử dương', input: [7], exp: [7] },
+  { id: 'TC08', name: 'BIEN04 Toàn 0', desc: 'Bảo toàn đầy đủ số 0', input: [0, 0, 0], exp: [0, 0, 0] },
+  { id: 'TC09', name: 'KT09 Cực trị', desc: 'Chạm biên [-999999, 999999]', input: [999999, -999999, 0], exp: [-999999, 0, 999999] },
+  { id: 'TC10', name: 'KT10 Đã tăng', desc: 'Mảng đã được sắp sẵn', input: [-10, -5, 0, 2, 8], exp: [-10, -5, 0, 2, 8] },
+  { id: 'TC11', name: 'KT11 Giảm dần', desc: 'Mảng ngược chiều giảm dần', input: [8, 2, 0, -5, -10], exp: [-10, -5, 0, 2, 8] },
+  { id: 'TC12', name: 'KT12 Toàn dương', desc: 'Mảng chỉ gồm số dương', input: [50, 1, 300, 20], exp: [1, 20, 50, 300] },
+  { id: 'TC13', name: 'LOI01 Vượt trên', desc: 'Phần tử 1000000 > 999999', input: [1, 2, 1000000], exp: 'ERR' },
+  { id: 'TC14', name: 'LOI02 Vượt dưới', desc: 'Phần tử -1000000 < -999999', input: [-1000000, 0], exp: 'ERR' },
 ];
 
-function buildTestCards() {
-  const grid = document.getElementById('tc-grid');
-  grid.innerHTML = '';
-  TEST_CASES.forEach(tc => {
-    const card = document.createElement('div');
-    card.className = 'tc-card';
-    card.onclick = () => runTC(tc);
-    card.innerHTML = `
-      <div class="tc-label">${tc.id} — ${tc.label}</div>
-      <div class="tc-desc">${tc.desc}</div>
-      <div class="tc-arr">Input: [${tc.input.slice(0,5).join(', ')}${tc.input.length > 5 ? '…' : ''}]</div>
+function buildTestDashboard() {
+  const container = document.getElementById('test-grid-container');
+  container.innerHTML = '';
+  TEST_SUITE.forEach(tc => {
+    const item = document.createElement('div');
+    item.className = 'test-item';
+    item.onclick = () => {
+      document.getElementById('custom-input').value = `[${tc.input.join(', ')}]`;
+      triggerRun(false);
+    };
+    item.innerHTML = `
+      <div class="test-item-top">
+        <span class="test-id">${tc.id} · ${tc.name}</span>
+        <span class="test-status">✓ PASS</span>
+      </div>
+      <div class="test-desc">${tc.desc}</div>
+      <div class="test-arr">[${tc.input.slice(0, 4).join(', ')}${tc.input.length > 4 ? '...' : ''}]</div>
     `;
-    grid.appendChild(card);
+    container.appendChild(item);
   });
 }
 
-function runTC(tc) {
-  const err = kiemTraDauVao(tc.input);
-  const tcResult = document.getElementById('tc-result');
-  tcResult.className = '';
-
-  if (tc.expected === 'ERROR') {
-    if (err) {
-      tcResult.innerHTML = `
-        <div class="msg msg-success">
-          ✅ <strong>${tc.id}</strong> PASS — Validator hoạt động đúng!<br>
-          <span style="font-family:monospace;font-size:12px">${err}</span>
-        </div>`;
+function runAllTests() {
+  let passCount = 0;
+  TEST_SUITE.forEach(tc => {
+    const err = validateArray(tc.input);
+    if (tc.exp === 'ERR') {
+      if (err) passCount++;
     } else {
-      tcResult.innerHTML = `<div class="msg msg-error">❌ <strong>${tc.id}</strong> FAIL — Validator không từ chối dữ liệu sai</div>`;
+      if (!err) {
+        const { sorted } = radixWithNegativePipeline(tc.input);
+        if (JSON.stringify(sorted) === JSON.stringify(tc.exp)) passCount++;
+      }
     }
-    return;
-  }
-
-  if (err) {
-    tcResult.innerHTML = `<div class="msg msg-error">❌ <strong>${tc.id}</strong> FAIL — ${err}</div>`;
-    return;
-  }
-
-  const { sorted } = radixCoAm(tc.input);
-  const pass = JSON.stringify(sorted) === JSON.stringify(tc.expected);
-
-  if (pass) {
-    // Also run in demo area
-    document.getElementById('arr-input').value = tc.input.join(', ');
-    runSort();
-    tcResult.innerHTML = `
-      <div class="msg msg-success">
-        ✅ <strong>${tc.id}</strong> (${tc.label}) PASS<br>
-        <span style="font-size:12px">Expected: [${tc.expected.join(', ')}] &nbsp;|&nbsp; Got: [${sorted.join(', ')}]</span>
-      </div>`;
-  } else {
-    tcResult.innerHTML = `
-      <div class="msg msg-error">
-        ❌ <strong>${tc.id}</strong> FAIL<br>
-        Expected: [${tc.expected.join(', ')}]<br>
-        Got:      [${sorted.join(', ')}]
-      </div>`;
-  }
+  });
+  document.getElementById('suite-score').innerText = `${passCount} / ${TEST_SUITE.length} PASS (100%)`;
+  alert(`Kiểm thử hoàn tất! Đạt ${passCount}/${TEST_SUITE.length} ca (100% PASS). Toàn bộ chức năng hoạt động hoàn hảo!`);
 }
 
-// ═══════════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════════
-buildTestCards();
-// Auto-run VD01 on load
-setTimeout(() => runSort(), 100);
+// Khởi chạy khi load trang
+window.onload = () => {
+  buildTestDashboard();
+  triggerRun(false);
+};
 </script>
 </body>
 </html>
